@@ -1,0 +1,6 @@
+back/.cache
+front/.cache
+front/dist
+node_modules
+abc.tsx
+package-lock.json

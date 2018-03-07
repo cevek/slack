@@ -1,0 +1,33 @@
+import * as React from 'react';
+import { connect, Dispatch } from 'react-redux';
+import { State } from './reducers';
+import MessageView from './Message';
+import { Channel, Message } from './interfaces';
+import { sendMessage } from './actions';
+
+export default connect(
+    (state: State) => ({
+        channelId: state.chats.currentChannelId,
+    }),
+    dispatch => ({
+        sendMessage: (channelId: string, text: string) => dispatch(sendMessage(channelId, text)),
+    })
+)(SendMessageForm);
+
+function SendMessageForm(props: { channelId: string; sendMessage(channelId: string, text: string): void }) {
+    let input: HTMLInputElement | null;
+
+    return (
+        <div className="send-message-form">
+            <form
+                onSubmit={e => {
+                    props.sendMessage(props.channelId, input!.value);
+                    e.preventDefault();
+                    input!.value = '';
+                }}>
+                <input ref={el => (input = el)} type="text" />
+                <button>Send</button>
+            </form>
+        </div>
+    );
+}
