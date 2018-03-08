@@ -1,11 +1,14 @@
 import * as Types from '../constants';
-import { Channel, User, Message } from '../interfaces';
+import { Channel, Message, User } from '../interfaces';
 
 const initialState: ChatState = {
     channels: [],
     messagesByChannels: {},
+    unreadMessagesByChannels: {},
     users: [],
     currentChannelId: undefined,
+    currentUserId: undefined,
+    isCreateChannelFormVisible: false,
     me: undefined,
 };
 
@@ -13,8 +16,11 @@ export interface ChatState {
     channels: Channel[];
     users: User[];
     messagesByChannels: { [key: string]: Message[] };
+    unreadMessagesByChannels: { [key: string]: boolean };
     currentChannelId: string | undefined;
+    currentUserId: string | undefined;
     me: User | undefined;
+    isCreateChannelFormVisible: boolean;
 }
 
 export function chats(state = initialState, action: any) {
@@ -25,6 +31,10 @@ export function chats(state = initialState, action: any) {
                 messagesByChannels: {
                     ...state.messagesByChannels,
                     [action.channelId]: action.payload,
+                },
+                unreadMessagesByChannels: {
+                    ...state.unreadMessagesByChannels,
+                    [action.channelId]: false,
                 },
             };
 
@@ -42,14 +52,23 @@ export function chats(state = initialState, action: any) {
                 ...state,
                 messagesByChannels: {
                     ...state.messagesByChannels,
-                    [action.payload.channelId]: [...(state.messagesByChannels[action.payload.channelId] || []), action.payload],
+                    [action.payload.channelId]: [
+                        ...(state.messagesByChannels[action.payload.channelId] || []),
+                        action.payload,
+                    ],
+                },
+                unreadMessagesByChannels: {
+                    ...state.unreadMessagesByChannels,
+                    [action.payload.channelId]: action.payload.fromUserId !== state.me!.id,
                 },
             };
         case Types.SELECT_CHANNEL:
-            return { ...state, currentChannelId: action.payload };
+            return { ...state, currentChannelId: action.payload.channelId, currentUserId: action.payload.userId };
+
+        case Types.IS_CHANNEL_FORM_VISIBLE:
+            return { ...state, isCreateChannelFormVisible: action.payload };
 
         default:
             return state;
     }
 }
-

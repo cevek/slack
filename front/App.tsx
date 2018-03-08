@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import { State } from './reducers';
 import { RegisterContainer } from './Register';
 import { User } from './interfaces';
+import CreateChannel from './CreateChannel';
 
 export default connect((state: State) => ({ me: state.chats.me }))(App);
 
@@ -17,6 +18,8 @@ function App(props: { me: User | undefined }) {
                 <>
                     <Sidebar />
                     <Chat />
+
+                    <CreateChannel />
                 </>
             )}
         </div>

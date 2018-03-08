@@ -31,6 +31,7 @@ interface Channel {
 
 const users: User[] = []; //new Map<string, User>();
 const channels: Channel[] = []; //new Map<string, Channel>();
+const userUserChannels = new Map<string, Channel>();
 
 const io = Server(server);
 
@@ -51,25 +52,26 @@ io.on('connection', socket => {
 
     function checkAuth(done: (ack: any) => void) {
         if (currentUser === undefined) {
-            done({ status: 'error', error: 'you need to register' });
+            done({ status: 'error', error: 'You need to register' });
             return false;
         }
         return true;
     }
 
     function getChannelWithUser(user: User) {
-        const channelId = user.id > currentUser!.id ? currentUser!.id + '_' + user.id : user.id + '_' + currentUser!.id;
-        let channel = channels.find(ch => ch.id === channelId);
+        const hash = user.id > currentUser!.id ? currentUser!.id + '_' + user.id : user.id + '_' + currentUser!.id;
+        let channel = userUserChannels.get(hash);
         if (channel === undefined) {
             channel = {
-                id: channelId,
+                id: genId(),
                 isPrivate: true,
                 messages: [],
                 name: '',
             };
             channels.push(channel);
-            userJoin(currentUser!, channel);
-            userJoin(user, channel);
+            userUserChannels.set(hash, channel);
+            joinUserToChannel(currentUser!, channel);
+            joinUserToChannel(user, channel);
         }
 
         return channel;
@@ -102,19 +104,22 @@ io.on('connection', socket => {
     }
 
     socket.on('register', (data: { name: string }, done: (ack: any) => void) => {
+        if (typeof data.name !== 'string' || data.name.length === 0 || data.name.length > 20)
+            return done({ status: 'error', error: 'Name is not correct' });
         const existsUser = users.find(user => user.name === data.name);
-        if (existsUser !== undefined) return done({ status: 'error', error: 'name is already registered' });
+        if (existsUser !== undefined) return done({ status: 'error', error: 'Name is already registered' });
         currentUser = { id: genId(), name: data.name, socket, session: sid, inRooms: [] };
         users.push(currentUser);
         users.forEach(user => {
             if (user === currentUser) return;
-            io
-                .to(user.socket.id)
-                .emit('userAdded', {
-                    id: currentUser!.id,
-                    name: currentUser!.name,
-                    channelId: getChannelWithUser(user).id,
-                });
+            io.to(user.socket.id).emit('userAdded', {
+                id: currentUser!.id,
+                name: currentUser!.name,
+                channelId: getChannelWithUser(user).id,
+            });
+        });
+        channels.filter(channel => !channel.isPrivate).forEach(channel => {
+            joinUserToChannel(currentUser!, channel);
         });
         done({ ...getInfo(), sid: sid });
     });
@@ -141,14 +146,15 @@ io.on('connection', socket => {
 
     socket.on('createChannel', (data: { name: string }, done: (ack: any) => void) => {
         if (!checkAuth(done)) return;
+        if (typeof data.name !== 'string' || data.name.length === 0 || data.name.length > 20)
+            return done({ status: 'error', error: 'Name is not correct' });
         let channel = channels.find(channel => channel.name === data.name);
-        if (channel !== undefined) return done({ status: 'error', error: 'name is already registered' });
+        if (channel !== undefined) return done({ status: 'error', error: 'Name is already registered' });
         const channelId = genId();
         channel = { id: channelId, name: data.name, isPrivate: false, messages: [] };
         channels.push(channel);
         users.forEach(user => {
-            user.socket.join(channelId);
-            user.inRooms.push(channelId);
+            joinUserToChannel(user, channel!);
         });
         io.emit('channelAdded', channel);
         return done({ status: 'ok' });
@@ -165,15 +171,16 @@ io.on('connection', socket => {
         return message;
     }
 
-    function userJoin(user: User, channel: Channel) {
+    function joinUserToChannel(user: User, channel: Channel) {
         user.socket.join(channel.id);
         user.inRooms.push(channel.id);
     }
 
     socket.on('message', (data: { channelId: string; message: string }, done: (ack: any) => void) => {
         if (!checkAuth(done)) return;
+        users;
         let channel = channels.find(channel => channel.id === data.channelId);
-        if (channel === undefined) return done({ status: 'error', error: 'channel is not found' });
+        if (channel === undefined) return done({ status: 'error', error: 'Channel is not found' });
         const msg = createMessage(data.message, channel);
         io.to(channel.id).emit('message', msg);
         return done({ status: 'ok' });

@@ -10,13 +10,24 @@ export function Register(props: { register(name: string): void }) {
     let input: HTMLInputElement | null;
     return (
         <div className="register">
+            <h2>Enter to Chat</h2>
             <form
                 onSubmit={e => {
                     props.register(input!.value);
                     e.preventDefault();
                 }}>
-                <input ref={el => (input = el)} type="text" />
-                <button>Enter</button>
+                <input
+                    placeholder="Your nickname"
+                    required
+                    maxLength={20}
+                    autoFocus
+                    className="register__input"
+                    ref={el => (input = el)}
+                    type="text"
+                />
+                <div>
+                    <button className="register__btn">Enter</button>
+                </div>
             </form>
         </div>
     );

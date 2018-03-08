@@ -1,35 +1,32 @@
 import * as React from 'react';
 import { connect, Dispatch } from 'react-redux';
-import { selectChannel } from './actions';
+import { setVisibilityCreateChannelForm } from './actions';
 import { State } from './reducers';
 import Channels from './Channels';
 import { Channel, User } from './interfaces';
-import CreateChannel from './CreateChannel';
 
-const SidebarMapStateToProps = (state: any) => {
-    return {
-        channels: state.chats.channels,
-        users: state.chats.users,
-    };
-};
+export default connect(
+    ({ chats: { channels, users, me } }: State) => ({ channels, users, me }),
+    dispatch => ({
+        showCreateChannelForm: () => dispatch(setVisibilityCreateChannelForm(true)),
+    })
+)(Sidebar);
 
-export default connect(({ chats: { channels, users, me } }: State) => ({ channels, users, me }))(Sidebar);
-
-function Sidebar(props: { channels: Channel[]; users: User[]; me: User }) {
+function Sidebar(props: { channels: Channel[]; users: User[]; me: User | undefined; showCreateChannelForm(): void }) {
     return (
-        <div>
-            <div>
-                <div>Channels</div>
+        <div className="sidebar">
+            <div className="sidebar__channels">
+                <div className="sidebar__title">
+                    Channels
+                    <div onClick={props.showCreateChannelForm} className="sidebar__plus">
+                        +
+                    </div>
+                </div>
                 <Channels channels={props.channels} />
-                <CreateChannel />
             </div>
-            <div>
-                <div>Users</div>
-                <Channels
-                    channels={props.users
-                        .filter(user => user.id !== props.me.id)
-                        .map(user => ({ id: user.channelId, name: user.name }))}
-                />
+            <div className="sidebar__users">
+                <div className="sidebar__title">Direct Messages</div>
+                <Channels channels={props.users.filter(user => user.id !== props.me!.id)} />
             </div>
         </div>
     );

@@ -1,8 +1,7 @@
 import * as React from 'react';
 import { connect, Dispatch } from 'react-redux';
 import { State } from './reducers';
-import MessageView from './Message';
-import { Channel, Message } from './interfaces';
+import { Message } from './interfaces';
 import { sendMessage } from './actions';
 
 export default connect(
@@ -14,7 +13,12 @@ export default connect(
     })
 )(SendMessageForm);
 
-function SendMessageForm(props: { channelId: string; sendMessage(channelId: string, text: string): void }) {
+function SendMessageForm(props: {
+    name: string;
+    isChannel: boolean;
+    channelId: string;
+    sendMessage(channelId: string, text: string): void;
+}) {
     let input: HTMLInputElement | null;
 
     return (
@@ -25,8 +29,12 @@ function SendMessageForm(props: { channelId: string; sendMessage(channelId: stri
                     e.preventDefault();
                     input!.value = '';
                 }}>
-                <input ref={el => (input = el)} type="text" />
-                <button>Send</button>
+                <input
+                    className="send-message-form__input"
+                    ref={el => (input = el)}
+                    type="text"
+                    placeholder={'Message ' + (props.isChannel ? '#' : '@') + props.name}
+                />
             </form>
         </div>
     );

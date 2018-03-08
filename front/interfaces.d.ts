@@ -4,6 +4,7 @@ export interface Message {
     fromUserId: string;
     date: Date;
     message: string;
+    read: boolean;
 }
 
 export interface Channel {
