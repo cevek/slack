@@ -8,6 +8,10 @@ const server = http.createServer(app.callback())
 server.listen(3000);
 console.log('App is listening on http://localhost:3000/');
 
+process.on('uncaughtException', function (err) {
+    console.error('Caught exception: ', err);
+});
+
 class Message {
     channelId: string;
     fromUserId: string;
