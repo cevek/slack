@@ -6,6 +6,7 @@ const app = new Koa();
 app.use(KoaStatic('../front/dist/'));
 const server = http.createServer(app.callback())
 server.listen(3000);
+console.log('App is listening on http://localhost:3000/');
 
 class Message {
     channelId: string;
