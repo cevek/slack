@@ -1,6 +1,11 @@
 import Server from 'socket.io';
-import * as HTTP from 'http';
-const server = HTTP.createServer();
+import Koa from 'koa';
+import KoaStatic from 'koa-static';
+import http from 'http';
+const app = new Koa();
+app.use(KoaStatic('../front/dist/'));
+const server = http.createServer(app.callback())
+server.listen(3000);
 
 class Message {
     channelId: string;
@@ -19,7 +24,7 @@ class User {
 function genId() {
     return Math.random()
         .toString(33)
-        .substr(2, 5);
+        .substr(2, 10);
 }
 
 interface Channel {
@@ -29,8 +34,9 @@ interface Channel {
     isPrivate: boolean;
 }
 
-const users: User[] = []; //new Map<string, User>();
-const channels: Channel[] = []; //new Map<string, Channel>();
+const users: User[] = [];
+const channels: Channel[] = [];
+const channelsMap = new Map<string, Channel>();
 const userUserChannels = new Map<string, Channel>();
 
 const io = Server(server);
@@ -58,6 +64,11 @@ io.on('connection', socket => {
         return true;
     }
 
+    function createChannel(channel: Channel) {
+        channels.push(channel);
+        channelsMap.set(channel.id, channel);
+    }
+
     function getChannelWithUser(user: User) {
         const hash = user.id > currentUser!.id ? currentUser!.id + '_' + user.id : user.id + '_' + currentUser!.id;
         let channel = userUserChannels.get(hash);
@@ -68,7 +79,7 @@ io.on('connection', socket => {
                 messages: [],
                 name: '',
             };
-            channels.push(channel);
+            createChannel(channel);
             userUserChannels.set(hash, channel);
             joinUserToChannel(currentUser!, channel);
             joinUserToChannel(user, channel);
@@ -86,21 +97,6 @@ io.on('connection', socket => {
                 .filter(channel => !channel.isPrivate)
                 .map(channel => ({ id: channel.id, name: channel.name })),
         };
-    }
-
-    function findChannel(channelId: string) {
-        let channel = channels.find(channel => channel.id === channelId);
-        if (channel === undefined) {
-            const m = channelId.match(/^(.*?)_(.*?)$/);
-            if (m) {
-                const user1 = users.find(user => user.id === m[1]);
-                const user2 = users.find(user => user.id === m[2]);
-                if (user1 === undefined || user2 === undefined) {
-                    return;
-                }
-                return [];
-            }
-        }
     }
 
     socket.on('register', (data: { name: string }, done: (ack: any) => void) => {
@@ -131,7 +127,7 @@ io.on('connection', socket => {
 
     socket.on('getChannelMessages', (data: { channelId: string }, done: (ack: any) => void) => {
         if (!checkAuth(done)) return;
-        let channel = channels.find(channel => channel.id === data.channelId);
+        const channel = channelsMap.get(data.channelId);
         if (channel === undefined) {
             return done({
                 status: 'ok',
@@ -152,7 +148,7 @@ io.on('connection', socket => {
         if (channel !== undefined) return done({ status: 'error', error: 'Name is already registered' });
         const channelId = genId();
         channel = { id: channelId, name: data.name, isPrivate: false, messages: [] };
-        channels.push(channel);
+        createChannel(channel);
         users.forEach(user => {
             joinUserToChannel(user, channel!);
         });
@@ -178,13 +174,10 @@ io.on('connection', socket => {
 
     socket.on('message', (data: { channelId: string; message: string }, done: (ack: any) => void) => {
         if (!checkAuth(done)) return;
-        users;
-        let channel = channels.find(channel => channel.id === data.channelId);
+        const channel = channelsMap.get(data.channelId);
         if (channel === undefined) return done({ status: 'error', error: 'Channel is not found' });
         const msg = createMessage(data.message, channel);
         io.to(channel.id).emit('message', msg);
         return done({ status: 'ok' });
     });
 });
-
-server.listen(3001);
