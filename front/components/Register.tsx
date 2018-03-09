@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { connect, Dispatch } from 'react-redux';
-import { register } from './actions';
+import { register } from '../actions';
 
-export const RegisterContainer = connect(undefined, dispatch => ({
+export default connect(undefined, dispatch => ({
     register: (name: string) => dispatch(register(name)),
 }))(Register);
 

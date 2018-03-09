@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { connect, Dispatch } from 'react-redux';
-import { State } from './reducers';
-import { Message, User } from './interfaces';
+import { State } from '../reducers';
+import { Message, User } from '../interfaces';
 
 export default connect((state: State, props: { msg: Message }) => ({
     user: state.chats.users.find(user => user.id === props.msg.fromUserId),

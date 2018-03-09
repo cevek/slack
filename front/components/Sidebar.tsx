@@ -1,9 +1,9 @@
 import * as React from 'react';
 import { connect, Dispatch } from 'react-redux';
-import { setVisibilityCreateChannelForm } from './actions';
-import { State } from './reducers';
+import { setVisibilityCreateChannelForm } from '../actions';
+import { State } from '../reducers';
 import Channels from './Channels';
-import { Channel, User } from './interfaces';
+import { Channel, User } from '../interfaces';
 
 export default connect(
     ({ chats: { channels, users, me } }: State) => ({ channels, users, me }),

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { connect, Dispatch } from 'react-redux';
-import { createChannel, setVisibilityCreateChannelForm } from './actions';
-import { State } from './reducers';
+import { createChannel, setVisibilityCreateChannelForm } from '../actions';
+import { State } from '../reducers';
 
 export default connect(
     (state: State) => ({ isVisible: state.chats.isCreateChannelFormVisible }),

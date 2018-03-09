@@ -5,7 +5,7 @@ import io from 'socket.io-client';
 import { Dispatch, Store } from 'react-redux';
 import { Channel, Message, User } from './interfaces';
 
-const client = io('http://localhost:3001/', { query: { userSid: localStorage.getItem('sid') } });
+const client = io({ query: { userSid: localStorage.getItem('sid') } });
 
 export function initSocket(store: Redux.Store<{}>) {
     client.on('connect', () => {

@@ -1,9 +1,9 @@
 import * as React from 'react';
 import { connect, Dispatch } from 'react-redux';
-import { selectChannel } from './actions';
-import { State } from './reducers';
-import { Channel, Message, User } from './interfaces';
-import { isUser } from './utils';
+import { selectChannel } from '../actions';
+import { State } from '../reducers';
+import { Channel, User } from '../interfaces';
+import { isUser } from '../utils';
 
 export default connect(
     (state: State) => ({

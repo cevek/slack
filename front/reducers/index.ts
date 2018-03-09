@@ -1,5 +1,6 @@
 import { combineReducers } from 'redux';
-import { chats, ChatState } from './chats';
+import { chats } from './chats';
+import { ChatState } from '../interfaces';
 
 const rootReducer = combineReducers({
     chats,

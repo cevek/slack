@@ -1,5 +1,5 @@
 import * as Types from '../constants';
-import { Channel, Message, User } from '../interfaces';
+import { ChatState } from '../interfaces';
 
 const initialState: ChatState = {
     channels: [],
@@ -11,17 +11,6 @@ const initialState: ChatState = {
     isCreateChannelFormVisible: false,
     me: undefined,
 };
-
-export interface ChatState {
-    channels: Channel[];
-    users: User[];
-    messagesByChannels: { [key: string]: Message[] };
-    unreadMessagesByChannels: { [key: string]: boolean };
-    currentChannelId: string | undefined;
-    currentUserId: string | undefined;
-    me: User | undefined;
-    isCreateChannelFormVisible: boolean;
-}
 
 export function chats(state = initialState, action: any) {
     switch (action.type) {

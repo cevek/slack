@@ -17,3 +17,14 @@ export interface User {
     name: string;
     channelId: string;
 }
+
+export interface ChatState {
+    channels: Channel[];
+    users: User[];
+    messagesByChannels: { [key: string]: Message[] };
+    unreadMessagesByChannels: { [key: string]: boolean };
+    currentChannelId: string | undefined;
+    currentUserId: string | undefined;
+    me: User | undefined;
+    isCreateChannelFormVisible: boolean;
+}

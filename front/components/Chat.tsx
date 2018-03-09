@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { connect, Dispatch } from 'react-redux';
-import { State } from './reducers';
+import { State } from '../reducers';
 import MessageView from './Message';
-import { Channel, Message, User } from './interfaces';
+import { Channel, Message, User } from '../interfaces';
 import SendMessage from './SendMessage';
 
 export default connect((state: State) => ({
