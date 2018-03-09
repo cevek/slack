@@ -4,12 +4,16 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "cd front && npx parcel build index.html --public-url ./",
+    "start": "cd back && npx ts-node index.ts"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "koa": "^2.5.0",
+    "koa-serve": "^0.1.7",
+    "koa-static": "^4.0.2",
     "prettier": "^1.11.1",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
@@ -21,6 +25,8 @@
     "socket.io-client": "^2.0.4"
   },
   "devDependencies": {
+    "@types/koa": "^2.0.44",
+    "@types/koa-static": "^4.0.0",
     "@types/node": "^9.4.6",
     "@types/react": "^16.0.38",
     "@types/react-dom": "^16.0.4",
@@ -29,6 +35,8 @@
     "@types/socket.io": "^1.4.31",
     "@types/socket.io-client": "^1.4.32",
     "node-sass": "^4.7.2",
+    "parcel-bundler": "^1.6.2",
+    "ts-node": "^5.0.1",
     "typescript": "^2.8.0-dev.20180302"
   }
 }
