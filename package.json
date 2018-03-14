@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "cd front && npx parcel build index.html --public-url ./",
-    "start": "cd back && npx ts-node index.ts"
+    "build": "cd front && npx parcel build index.html --public-url ./ && cd ..",
+    "start": "npm run build && cd back && npx ts-node index.ts"
   },
   "keywords": [],
   "author": "",

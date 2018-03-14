@@ -4,11 +4,11 @@ import KoaStatic from 'koa-static';
 import http from 'http';
 const app = new Koa();
 app.use(KoaStatic('../front/dist/'));
-const server = http.createServer(app.callback())
+const server = http.createServer(app.callback());
 server.listen(3000);
 console.log('App is listening on http://localhost:3000/');
 
-process.on('uncaughtException', function (err) {
+process.on('uncaughtException', function(err) {
     console.error('Caught exception: ', err);
 });
 
