@@ -4,3 +4,5 @@
 ```
 docker-compose up
 ```
+
+Open http://localhost:3000
